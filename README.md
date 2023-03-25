@@ -5,7 +5,7 @@
 
 ## Features
 
-- Downloads OFAC SDN list in XML format
+- Downloads OFAC SDN list in XML format (keep in mind that it does not save the file, it downloads it, uses it but it won't keep it)
 - Parses OFAC SDN list and extracts relevant information
 - Downloads UN Security Council Consolidated list in XML format
 - Parses UN Security Council Consolidated list and extracts relevant information
