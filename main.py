@@ -1,3 +1,27 @@
+#
+ # Copyright (c) 2023 - Freddy Rivero
+ #
+ # Permission is hereby granted, free of charge, to any person obtaining a copy
+ # of this software and associated documentation files (the "Software"), to deal
+ # in the Software without restriction, including without limitation the rights
+ # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ # copies of the Software, and to permit persons to whom the Software is
+ # furnished to do so, subject to the following conditions:
+ #
+ # The above copyright notice and this permission notice shall be included in
+ # all copies or substantial portions of the Software.
+ #
+ # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ # THE SOFTWARE.
+#
+
+
+
 import requests
 import mysql.connector
 from lxml import etree
@@ -34,9 +58,7 @@ def parse_ofac_sdn_list(xml_data):
         return sdn_entries
     except etree.XMLSyntaxError as e:
         print(f"Error parsing OFAC SDN XML data: {e}")
-        return []
-    
-import xml.etree.ElementTree as ET
+        return [] 
 
 def parse_un_consolidated_list_entities(xml_data):
     if xml_data is None:
@@ -160,6 +182,8 @@ def parse_un_consolidated_list(xml_data):
 
 
 def save_to_database(entries, table_name, db_config):
+    cursor = None
+    connection = None
     try:
         connection = mysql.connector.connect(**db_config)
         cursor = connection.cursor()
@@ -185,6 +209,7 @@ def main():
         'user': 'root',
         'password': '',
         'database': 'ofac',
+        'use_pure' : True
     }
 
     # Download and parse OFAC SDN list in XML format
