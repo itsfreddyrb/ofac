@@ -180,6 +180,20 @@ def parse_un_consolidated_list(xml_data):
         print(f"Error parsing UN Consolidated XML data: {e}")
         return []
 
+def truncate_table(table_name, db_config):
+    try:
+        connection = mysql.connector.connect(**db_config)
+        cursor = connection.cursor()
+        sql = f"TRUNCATE TABLE {table_name}"
+        cursor.execute(sql)
+        connection.commit()
+    except MySQLConnectorError as e:
+        print(f"Error truncating table {table_name}: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 def save_to_database(entries, table_name, db_config):
     cursor = None
@@ -216,18 +230,21 @@ def main():
     ofac_sdn_url = "https://www.treasury.gov/ofac/downloads/sdn.xml"
     ofac_sdn_data = download_file(ofac_sdn_url)
     print(f"Downloaded OFAC SDN XML data: {ofac_sdn_data is not None}")
-
     ofac_sdn_entries = parse_ofac_sdn_list(ofac_sdn_data)
+
+    # Truncate tables before saving data
+    truncate_table('ofac_sdn', db_config)
+    truncate_table('un_consolidated', db_config)
+    truncate_table('un_consolidated_entities', db_config)
 
     # Save OFAC SDN entries to the database
     save_to_database(ofac_sdn_entries, 'ofac_sdn', db_config)
     print(f"{len(ofac_sdn_entries)} OFAC SDN entries saved to the database")
 
-        # Download and parse UN Security Council Consolidated list in XML format
+    # Download and parse UN Security Council Consolidated list in XML format
     un_consolidated_list_url = "https://scsanctions.un.org/resources/xml/en/consolidated.xml"
     un_consolidated_list_data = download_file(un_consolidated_list_url)
     print(f"Downloaded UN Consolidated XML data: {un_consolidated_list_data is not None}")
-
     un_consolidated_list_entries = parse_un_consolidated_list(un_consolidated_list_data)
     un_consolidated_list_entries_entities = parse_un_consolidated_list_entities(un_consolidated_list_data)
 
